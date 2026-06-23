@@ -1,1 +1,515 @@
-<h1>권신용입니다. 테스트</h1>
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>권신용 | 공학도</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;700;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:       #080e1a;
+      --surface:  #0d1726;
+      --border:   #1a2840;
+      --blue:     #2D7DD2;
+      --cyan:     #00C8E0;
+      --white:    #e8f0ff;
+      --muted:    #5a7090;
+      --tag-bg:   #0f1e35;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--white);
+      font-family: 'Noto Sans KR', sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ── Canvas Background ── */
+    #circuit-canvas {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      opacity: 0.18;
+    }
+
+    /* ── Layout ── */
+    .wrap { position: relative; z-index: 1; }
+
+    /* ── Nav ── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 20px 48px;
+      background: linear-gradient(to bottom, rgba(8,14,26,.95), transparent);
+    }
+    .nav-logo {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 14px;
+      color: var(--cyan);
+      letter-spacing: .08em;
+    }
+    .nav-links { display: flex; gap: 32px; }
+    .nav-links a {
+      font-size: 13px;
+      color: var(--muted);
+      text-decoration: none;
+      letter-spacing: .05em;
+      transition: color .2s;
+    }
+    .nav-links a:hover { color: var(--cyan); }
+
+    /* ── Hero ── */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 120px 48px 80px;
+      max-width: 960px;
+      margin: 0 auto;
+    }
+    .hero-eyebrow {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      color: var(--cyan);
+      letter-spacing: .2em;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .hero-eyebrow::before {
+      content: '';
+      display: inline-block;
+      width: 32px; height: 1px;
+      background: var(--cyan);
+    }
+    .hero-name {
+      font-size: clamp(52px, 10vw, 100px);
+      font-weight: 900;
+      line-height: 1.0;
+      letter-spacing: -.03em;
+      margin-bottom: 24px;
+    }
+    .hero-name span {
+      display: block;
+      background: linear-gradient(135deg, var(--white) 40%, var(--cyan));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .hero-desc {
+      font-size: 18px;
+      color: var(--muted);
+      font-weight: 300;
+      line-height: 1.8;
+      max-width: 540px;
+      margin-bottom: 48px;
+    }
+    .hero-desc strong { color: var(--white); font-weight: 700; }
+
+    .btn-row { display: flex; gap: 16px; flex-wrap: wrap; }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 14px 28px;
+      border-radius: 4px;
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: .05em;
+      text-decoration: none;
+      transition: all .2s;
+      cursor: pointer;
+      border: none;
+    }
+    .btn-primary {
+      background: var(--cyan);
+      color: var(--bg);
+    }
+    .btn-primary:hover { background: #00e6ff; transform: translateY(-2px); }
+    .btn-ghost {
+      background: transparent;
+      color: var(--cyan);
+      border: 1px solid var(--cyan);
+    }
+    .btn-ghost:hover { background: rgba(0,200,224,.08); }
+
+    /* ── Divider ── */
+    .section-divider {
+      width: 100%;
+      height: 1px;
+      background: linear-gradient(to right, transparent, var(--border), transparent);
+      margin: 0;
+    }
+
+    /* ── Section ── */
+    section {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 80px 48px;
+    }
+    .section-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: var(--cyan);
+      letter-spacing: .25em;
+      text-transform: uppercase;
+      margin-bottom: 40px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .section-label::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    /* ── Cards ── */
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 16px;
+    }
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 28px;
+      transition: border-color .2s, transform .2s;
+    }
+    .card:hover {
+      border-color: var(--blue);
+      transform: translateY(-4px);
+    }
+    .card-icon {
+      font-size: 28px;
+      margin-bottom: 16px;
+    }
+    .card-title {
+      font-size: 15px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      color: var(--white);
+    }
+    .card-body {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+
+    /* ── Tags ── */
+    .tag-list { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 40px; }
+    .tag {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      padding: 6px 14px;
+      background: var(--tag-bg);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      color: var(--muted);
+      letter-spacing: .05em;
+    }
+    .tag.active {
+      border-color: var(--cyan);
+      color: var(--cyan);
+    }
+
+    /* ── About text ── */
+    .about-text {
+      font-size: 17px;
+      line-height: 1.9;
+      color: #8fa8c8;
+      max-width: 660px;
+    }
+    .about-text strong { color: var(--white); }
+
+    /* ── Footer ── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 32px 48px;
+      text-align: center;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    /* ── Scroll indicator ── */
+    .scroll-hint {
+      position: absolute;
+      bottom: 40px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      color: var(--muted);
+      letter-spacing: .15em;
+      animation: bounce 2s infinite;
+    }
+    .scroll-hint svg { width: 16px; height: 16px; opacity: .5; }
+    @keyframes bounce {
+      0%, 100% { transform: translateX(-50%) translateY(0); }
+      50% { transform: translateX(-50%) translateY(6px); }
+    }
+
+    /* ── Blinking cursor ── */
+    .cursor {
+      display: inline-block;
+      width: 3px;
+      height: .85em;
+      background: var(--cyan);
+      margin-left: 4px;
+      vertical-align: middle;
+      animation: blink 1s step-end infinite;
+    }
+    @keyframes blink { 50% { opacity: 0; } }
+
+    /* ── Pulse dot ── */
+    .pulse-dot {
+      display: inline-block;
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--cyan);
+      margin-right: 8px;
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: .4; transform: scale(.7); }
+    }
+
+    @media (max-width: 640px) {
+      nav { padding: 16px 24px; }
+      .nav-links { display: none; }
+      .hero, section { padding-left: 24px; padding-right: 24px; }
+      footer { padding: 24px; }
+    }
+  </style>
+</head>
+<body>
+
+<canvas id="circuit-canvas"></canvas>
+
+<div class="wrap">
+
+  <!-- Nav -->
+  <nav>
+    <div class="nav-logo">KSY_2026</div>
+    <div class="nav-links">
+      <a href="#about">About</a>
+      <a href="#courses">Courses</a>
+      <a href="#skills">Skills</a>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <div class="hero" style="position:relative;">
+    <div class="hero-eyebrow">ENGINEERING STUDENT · 공주대학교 / 충남 RISE</div>
+    <h1 class="hero-name">
+      <span>권신용</span>
+    </h1>
+    <p class="hero-desc">
+      <strong>자동차 공학</strong>과 <strong>UAM</strong>을 공부하는 공학도입니다.<br />
+      차량 동역학, 회로 해석, 자율주행 제어 알고리즘에 관심이 있습니다.
+    </p>
+    <div class="btn-row">
+      <a class="btn btn-primary" href="#courses">수강 과목 보기</a>
+      <a class="btn btn-ghost" href="#about">더 알아보기</a>
+    </div>
+
+    <div class="scroll-hint">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M12 5v14M5 12l7 7 7-7"/>
+      </svg>
+      SCROLL
+    </div>
+  </div>
+
+  <div class="section-divider"></div>
+
+  <!-- About -->
+  <section id="about">
+    <div class="section-label">01 &nbsp; ABOUT</div>
+    <p class="about-text">
+      안녕하세요, <strong>권신용</strong>입니다.<br /><br />
+      충남 RISE 공유대학에서 자동차 및 UAM 공학을 전공하고 있습니다.
+      차량 동역학 모델링부터 Stanley 제어기 기반의 자율주행 시뮬레이션,
+      그리고 UAM 인증 프레임워크까지 폭넓은 분야를 공부하고 있습니다.<br /><br />
+      단순히 공식을 외우는 데 그치지 않고, <strong>왜 그렇게 되는지</strong>를 이해하는 것을 중요하게 생각합니다.
+    </p>
+  </section>
+
+  <div class="section-divider"></div>
+
+  <!-- Courses -->
+  <section id="courses">
+    <div class="section-label">02 &nbsp; COURSES</div>
+    <div class="card-grid">
+      <div class="card">
+        <div class="card-icon">🚗</div>
+        <div class="card-title">차량 동역학</div>
+        <div class="card-body">ESC 요 모멘트 보정, 쿨롱 마찰원, Pacejka 매직 포뮬라 타이어 모델, EV 구동 저항</div>
+      </div>
+      <div class="card">
+        <div class="card-icon">🤖</div>
+        <div class="card-title">자율주행 / MATLAB</div>
+        <div class="card-body">4WS 기구학 자전거 모델, Stanley 횡방향 제어기, 경로 추종 시뮬레이션</div>
+      </div>
+      <div class="card">
+        <div class="card-icon">⚡</div>
+        <div class="card-title">전기 회로</div>
+        <div class="card-body">마디 해석법, BJT 공통 이미터 회로, 종속 전압원 포함 회로 분석</div>
+      </div>
+      <div class="card">
+        <div class="card-icon">📐</div>
+        <div class="card-title">정역학 / 재료역학</div>
+        <div class="card-body">트러스 단면법, 적분을 통한 도심 계산, 연속체 역학 기초</div>
+      </div>
+      <div class="card">
+        <div class="card-icon">🚁</div>
+        <div class="card-title">도심항공교통 (UAM)</div>
+        <div class="card-body">Coanda 효과, Reynolds 수, ICAO·EASA 인증 프레임워크, V2X 및 HD Map</div>
+      </div>
+      <div class="card">
+        <div class="card-icon">∫</div>
+        <div class="card-title">공학 수학</div>
+        <div class="card-body">회전체의 겉넓이 적분, 편미분, 급수 해법 등 공학 응용 수학</div>
+      </div>
+    </div>
+  </section>
+
+  <div class="section-divider"></div>
+
+  <!-- Skills -->
+  <section id="skills">
+    <div class="section-label">03 &nbsp; SKILLS &amp; TOOLS</div>
+    <div class="tag-list">
+      <span class="tag active">MATLAB</span>
+      <span class="tag active">Simulink</span>
+      <span class="tag active">Python</span>
+      <span class="tag active">NumPy</span>
+      <span class="tag">C</span>
+      <span class="tag">HTML / CSS</span>
+      <span class="tag">Vehicle Dynamics</span>
+      <span class="tag">Stanley Controller</span>
+      <span class="tag">Pacejka Tire Model</span>
+      <span class="tag">BJT 회로 분석</span>
+      <span class="tag">노달 해석</span>
+      <span class="tag">UAM 인증</span>
+      <span class="tag">LCA (전생애주기 분석)</span>
+      <span class="tag">EV 파워트레인</span>
+      <span class="tag">LaTeX</span>
+    </div>
+  </section>
+
+  <div class="section-divider"></div>
+
+  <!-- Footer -->
+  <footer>
+    <span class="pulse-dot"></span>
+    권신용 · 충남 RISE 공유대학 · 2026
+    <span class="cursor"></span>
+  </footer>
+
+</div><!-- /wrap -->
+
+<script>
+/* ── Circuit board canvas background ── */
+(function () {
+  const canvas = document.getElementById('circuit-canvas');
+  const ctx = canvas.getContext('2d');
+  let W, H, nodes, edges;
+
+  function resize() {
+    W = canvas.width  = window.innerWidth;
+    H = canvas.height = window.innerHeight;
+    build();
+  }
+
+  function rnd(min, max) { return min + Math.random() * (max - min); }
+
+  function build() {
+    nodes = [];
+    edges = [];
+    const cols = Math.ceil(W / 90);
+    const rows = Math.ceil(H / 90);
+    for (let r = 0; r <= rows; r++) {
+      for (let c = 0; c <= cols; c++) {
+        nodes.push({
+          x: c * 90 + rnd(-20, 20),
+          y: r * 90 + rnd(-20, 20),
+          r: Math.random() < 0.3 ? rnd(2, 5) : 0,
+          lit: Math.random() < 0.25,
+          phase: Math.random() * Math.PI * 2,
+        });
+      }
+    }
+    // horizontal + vertical edges with gaps
+    const cols1 = cols + 1;
+    for (let r = 0; r <= Math.ceil(H / 90); r++) {
+      for (let c = 0; c <= cols; c++) {
+        const idx = r * cols1 + c;
+        if (c < cols && Math.random() < 0.55) edges.push([idx, idx + 1]);
+        if (r < Math.ceil(H / 90) && Math.random() < 0.55) edges.push([idx, idx + cols1]);
+      }
+    }
+  }
+
+  let t = 0;
+  function draw() {
+    ctx.clearRect(0, 0, W, H);
+    t += 0.012;
+
+    // edges
+    ctx.lineWidth = 1;
+    for (const [a, b] of edges) {
+      if (!nodes[a] || !nodes[b]) continue;
+      const pulse = 0.5 + 0.5 * Math.sin(t + nodes[a].phase);
+      ctx.strokeStyle = `rgba(0,200,224,${0.06 + 0.10 * pulse})`;
+      ctx.beginPath();
+      ctx.moveTo(nodes[a].x, nodes[a].y);
+      ctx.lineTo(nodes[b].x, nodes[b].y);
+      ctx.stroke();
+    }
+
+    // nodes
+    for (const n of nodes) {
+      if (n.r === 0) continue;
+      const pulse = 0.5 + 0.5 * Math.sin(t * 1.4 + n.phase);
+      ctx.fillStyle = n.lit
+        ? `rgba(0,200,224,${0.5 + 0.4 * pulse})`
+        : `rgba(45,125,210,${0.25 + 0.2 * pulse})`;
+      ctx.beginPath();
+      ctx.arc(n.x, n.y, n.r, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    requestAnimationFrame(draw);
+  }
+
+  window.addEventListener('resize', resize);
+  resize();
+  draw();
+})();
+</script>
+
+</body>
+</html>
