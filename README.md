@@ -19,3 +19,15 @@ git config --global user.email "sbeetle1003@gmail.com"
 6교시: 변수와 자료형
 7교시: 연산자와 표현식, input 함수 해석
 8교시: 문자열 f-string, format
+
+
+2026-06-23
+
+1교시: google slide 정보 공유
+2교시: if 조건문, bool자료형
+3교시: github io 페이지 만들기
+4교시: if조건문, 삼향 연산자, False로 변환되는 예
+5교시: list, list 메소드, 바인딩, pyi
+6교시: list, for문
+7교시: dict.
+8교시: webview, 활용으로 메모장까지.

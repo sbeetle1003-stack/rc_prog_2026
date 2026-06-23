@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>메모장</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Malgun Gothic', sans-serif;
+      background: #f0f2f5;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      padding: 20px;
+      gap: 12px;
+    }
+
+    h2 {
+      font-size: 18px;
+      color: #333;
+    }
+
+    textarea {
+      flex: 1;
+      width: 100%;
+      padding: 16px;
+      font-size: 15px;
+      font-family: 'Malgun Gothic', sans-serif;
+      border: 2px solid #ddd;
+      border-radius: 10px;
+      resize: none;
+      outline: none;
+      transition: border-color 0.2s;
+      background: white;
+      color: #222;
+      line-height: 1.7;
+    }
+
+    textarea:focus {
+      border-color: #4a90e2;
+    }
+
+    .btn-row {
+      display: flex;
+      gap: 10px;
+    }
+
+    button {
+      flex: 1;
+      padding: 12px;
+      font-size: 15px;
+      font-family: 'Malgun Gothic', sans-serif;
+      font-weight: bold;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.1s;
+    }
+
+    button:active { transform: scale(0.97); }
+
+    #btn-save {
+      background: #4a90e2;
+      color: white;
+    }
+    #btn-save:hover { background: #357abd; }
+
+    #btn-load {
+      background: #6c757d;
+      color: white;
+    }
+    #btn-load:hover { background: #545b62; }
+
+    #btn-clear {
+      background: #e74c3c;
+      color: white;
+      flex: 0.5;
+    }
+    #btn-clear:hover { background: #c0392b; }
+
+    #status {
+      font-size: 13px;
+      color: #888;
+      text-align: center;
+      height: 18px;
+    }
+
+    #status.ok  { color: #27ae60; }
+    #status.err { color: #e74c3c; }
+  </style>
+</head>
+<body>
+
+  <h2>📝 메모장</h2>
+
+  <textarea id="memo" placeholder="여기에 메모를 입력하세요..."></textarea>
+
+  <div class="btn-row">
+    <button id="btn-save">💾 저장</button>
+    <button id="btn-load">📂 불러오기</button>
+    <button id="btn-clear">🗑️ 초기화</button>
+  </div>
+
+  <div id="status"></div>
+
+  <script>
+    const memo    = document.getElementById('memo');
+    const status  = document.getElementById('status');
+
+    function showStatus(msg, type = 'ok') {
+      status.textContent = msg;
+      status.className = type;
+      setTimeout(() => { status.textContent = ''; status.className = ''; }, 2000);
+    }
+
+    document.getElementById('btn-save').addEventListener('click', () => {
+      const text = memo.value.trim();
+      if (!text) {
+        showStatus('내용을 입력해주세요.', 'err');
+        return;
+      }
+      localStorage.setItem('saved_memo', memo.value);
+      showStatus('✅ 저장됐어요!', 'ok');
+    });
+
+    document.getElementById('btn-load').addEventListener('click', () => {
+      const saved = localStorage.getItem('saved_memo');
+      if (!saved) {
+        showStatus('저장된 메모가 없어요.', 'err');
+        return;
+      }
+      memo.value = saved;
+      showStatus('📂 불러왔어요!', 'ok');
+    });
+
+    document.getElementById('btn-clear').addEventListener('click', () => {
+      memo.value = '';
+      showStatus('🗑️ 초기화됐어요.', 'ok');
+    });
+
+    // 시작할 때 자동으로 불러오기
+    window.addEventListener('load', () => {
+      const saved = localStorage.getItem('saved_memo');
+      if (saved) memo.value = saved;
+    });
+  </script>
+
+</body>
+</html>
